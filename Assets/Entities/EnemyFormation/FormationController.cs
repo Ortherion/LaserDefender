@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemySpawner : MonoBehaviour {
+public class FormationController : MonoBehaviour {
     public GameObject enemyPrefab;
     public float width = 10f;
     public float height = 5f;
     public float speed = 5.0f;
+    public float spawnDelay = 0.5f;
 
     private bool movingRight = true;
     private float xMin;
@@ -14,7 +15,7 @@ public class EnemySpawner : MonoBehaviour {
     // Use this for initialization
     void Start() {
         determineBoundaries();
-        generateEnemies();
+        SpawnUntilFull();
     }
 
     public void OnDrawGizmos() {
@@ -24,6 +25,10 @@ public class EnemySpawner : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         enemyMovement();
+        if (AllMembersDead()) {
+            Debug.Log("Empty Formation.");
+            SpawnUntilFull();
+        }
     }
 
     /// <summary>
@@ -47,6 +52,17 @@ public class EnemySpawner : MonoBehaviour {
         foreach (Transform child in transform) {
             GameObject enemy = Instantiate(enemyPrefab, child.transform.position, Quaternion.identity) as GameObject;
             enemy.transform.parent = child;
+        }
+    }
+
+    void SpawnUntilFull() {
+        Transform freePosition = NextFreePosition();
+        if (freePosition) {
+            GameObject enemy = Instantiate(enemyPrefab, freePosition.position, Quaternion.identity) as GameObject;
+            enemy.transform.parent = freePosition;
+        }
+        if (NextFreePosition()) {
+            Invoke("SpawnUntilFull", spawnDelay);
         }
     }
 
@@ -79,5 +95,27 @@ public class EnemySpawner : MonoBehaviour {
     void restrictFormationPosition() {
         float newX = Mathf.Clamp(transform.position.x, xMin, xMax);
         transform.position = new Vector3(newX, transform.position.y, transform.position.z);
+    }
+
+    Transform NextFreePosition() {
+        foreach(Transform childPositionGameObject in transform) {
+            if(childPositionGameObject.childCount == 0) {
+                return childPositionGameObject;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// If all members of the enemy formation are dead, returns true
+    /// </summary>
+    /// <returns>Returns false if child exists, true if none exist.</returns>
+    bool AllMembersDead() {
+        foreach(Transform childPositionGameObject in transform) {
+            if (childPositionGameObject.childCount > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
