@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour {
     public float projectileSpeed = 0;
     public float firingRate = 0.2f;
     public float health = 250f;
+    public AudioClip fireLaser;
+    public ParticleSystem thruster;
 
     float xMin;
     float xMax;
@@ -20,14 +22,14 @@ public class PlayerController : MonoBehaviour {
         xMin = leftMost.x + padding;
         xMax = rightMost.x - padding;
     }
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update() {
         PlayerMovement();
         LaunchProjectile();
-	}
+        generateThruster();
+    }
 
-    void PlayerMovement()
-    {
+    void PlayerMovement() {
         if (Input.GetKey(KeyCode.LeftArrow)) {
             //transform.position += new Vector3(-speed * Time.deltaTime, 0f, 0f);
             transform.position += Vector3.left * speed * Time.deltaTime;
@@ -57,6 +59,7 @@ public class PlayerController : MonoBehaviour {
         Vector3 offset = new Vector3(0f, .75f, 0f);
         GameObject beam = Instantiate(projectile, transform.position + offset, Quaternion.identity) as GameObject;
         beam.GetComponent<Rigidbody2D>().velocity = new Vector3(0f, projectileSpeed, 0f);
+        AudioSource.PlayClipAtPoint(fireLaser, transform.position, 1f);
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
@@ -69,5 +72,9 @@ public class PlayerController : MonoBehaviour {
                 Destroy(gameObject);
             }
         }
+    }
+
+    void generateThruster() {
+        thruster.transform.position = this.transform.position + new Vector3(0f, -.4f, 1f);
     }
 }
