@@ -39,7 +39,7 @@ public class EnemyBehavior : MonoBehaviour {
     void Die() {
         Destroy(gameObject);
         scoreKeeper.Score(scoreValue);
-        AudioSource.PlayClipAtPoint(enemyDown, transform.position, 1);
+        AudioSource.PlayClipAtPoint(enemyDown, transform.position, 2f);
     }
 
     void EnemyFire() {
@@ -47,6 +47,6 @@ public class EnemyBehavior : MonoBehaviour {
         GameObject enemyMissile = Instantiate(projectile, startPosition, Quaternion.identity) as GameObject;
         enemyMissile.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
         enemyMissile.GetComponent<Rigidbody2D>().velocity = new Vector3(0f, -projectileSpeed, 0f);
-        AudioSource.PlayClipAtPoint(enemyLaser, transform.position, 1f);
+        AudioSource.PlayClipAtPoint(enemyLaser, transform.position, 2f);
     }
 }

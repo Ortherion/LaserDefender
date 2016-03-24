@@ -9,7 +9,6 @@ public class PlayerController : MonoBehaviour {
     public float firingRate = 0.2f;
     public float health = 250f;
     public AudioClip fireLaser;
-    public ParticleSystem thruster;
 
     float xMin;
     float xMax;
@@ -26,7 +25,6 @@ public class PlayerController : MonoBehaviour {
     void Update() {
         PlayerMovement();
         LaunchProjectile();
-        generateThruster();
     }
 
     void PlayerMovement() {
@@ -56,10 +54,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Fire() {
-        Vector3 offset = new Vector3(0f, .75f, 0f);
-        GameObject beam = Instantiate(projectile, transform.position + offset, Quaternion.identity) as GameObject;
+        GameObject beam = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
         beam.GetComponent<Rigidbody2D>().velocity = new Vector3(0f, projectileSpeed, 0f);
-        AudioSource.PlayClipAtPoint(fireLaser, transform.position, 1f);
+        AudioSource.PlayClipAtPoint(fireLaser, transform.position, 2f);
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
@@ -69,12 +66,14 @@ public class PlayerController : MonoBehaviour {
             health -= missile.GetDamage();
             missile.Hit();
             if (health <= 0) {
-                Destroy(gameObject);
+                Die();
             }
         }
     }
 
-    void generateThruster() {
-        thruster.transform.position = this.transform.position + new Vector3(0f, -.4f, 1f);
+    void Die() {
+        LevelManager man = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        man.LoadLevel("Win Screen");
+        Destroy(gameObject);
     }
 }
